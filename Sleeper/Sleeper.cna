@@ -1,0 +1,42 @@
+alias sleeper {
+    $bid = $1;
+    $command = $2;
+    $arch = binfo($bid, "barch");
+	
+	if ($arch eq "x64") {
+        $handle = openf(script_resource("./bin/Sleeper.x64.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    } else {
+        $handle = openf(script_resource("./bin/Sleeper.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    }
+
+    if ($command eq "on") {
+        $log = "ES_SYSTEM_REQUIRED | ES_CONTINUOUS";
+        $command = 1;
+    } else if ($command eq "force") {
+        $log = "ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED | ES_CONTINUOUS";
+        $command = 65;
+    } else if ($command eq "off") {
+        $log = "ES_CONTINUOUS";
+        $command = 0;
+    } else {
+        berror($1, "Check parameters: help sleeper\n");
+        return;
+    }
+    
+    $args = bof_pack($1, "i", $command);
+    btask($1, "Changing Sleep state to " . $log . ".");
+    beacon_inline_execute($1, $data, "go", $args);
+}
+
+beacon_command_register("sleeper", "BOF to call the SetThreadExecutionState function to prevent host from Sleeping", 
+"\nUsage: sleeper [argument(required)]\n
+                Arguments       Description
+                ---------       -----------
+                off             Set the `ES_CONTINUOUS` flag and return to Default state.
+                on              Set the `ES_SYSTEM_REQUIRED` flag to prevent the Sleep.
+                force           Set the `ES_SYSTEM_REQUIRED|ES_AWAYMODE_REQUIRED` flags to prevent the Sleep,
+                                even if the Sleep button is pressed\n");
