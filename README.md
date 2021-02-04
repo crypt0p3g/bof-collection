@@ -2,7 +2,7 @@
 
 | Name               | Description| 
 | ------------------ | ---------------------- | 
-| ChromeKeyDump      | BOF implementation of [Chlonium](https://github.com/rxwx/chlonium) tool to dump Chrome Masterkey and download Cookie/Login Data files   | 
+| ChromiumKeyDump    | BOF implementation of [Chlonium](https://github.com/rxwx/chlonium) tool to dump Chrome/Edge Masterkey and download Cookie/Login Data files   | 
 | Sleeper            | BOF to call the SetThreadExecutionState function to prevent host from `Sleeping` | 
 
 ### How to compile:
@@ -10,11 +10,11 @@
 - Visual Studio:
 
 ```
-x86: 
+x86:
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
 cl.exe /c /GS- /TP BOF.cpp /FoBOF.o
 
-x64: 
+x64:
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 cl.exe /c /GS- /TP BOF.cpp /FoBOF.x64.o
 ```
@@ -27,11 +27,11 @@ x64: x86_64-w64-mingw32-gcc -c BOF.cpp -o BOF.x64.o
 ```
 #### After compiling, place the object files (.o) into the bin folder and load the (.cna) files to Cobalt Strike.
 
-## ChromeKeyDump
+## ChromiumKeyDump
 
 ### Usage:
 ```
-chromekeydump [argument(required)]
+chromiumkeydump [edge|chrome] [argument(required)]
                Arguments      Description
                ---------      -----------
                masterkey      Dump Masterkey

