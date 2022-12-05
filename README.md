@@ -32,14 +32,18 @@ x64: x86_64-w64-mingw32-gcc -c BOF.cpp -o BOF.x64.o
 ### Usage:
 ```
 chromiumkeydump [edge|chrome] [argument(required)] [ChromePath(optional)]
-               Arguments      Description
-               ---------      -----------
-               masterkey      Dump Masterkey
-               cookies        Download Chrome Cookies file
-               logindata      Download Chrome Login Data file
-               all            Dump Masterkey and download files
+                Arguments       Description
+                ---------       -----------
+                masterkey       Dump Masterkey
+                cookies         Download Chrome Cookies file
+                logindata       Download Chrome Login Data file
+                all             Dump Masterkey and download files
+                
+                ChromePath      Path to custom installation directory
+                                !Set the path to where the [User Data] folder is located!
 
-               ChromePath      Path to custom installation directory (Example: D:\\Programs\\)
+                                Example: D:\\Programs\\
+                                         C:\\Users\\USER\\AppData\\Local
 ```
 ### References:
 https://github.com/rxwx/chlonium

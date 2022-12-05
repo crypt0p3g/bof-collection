@@ -43,8 +43,8 @@ BOF_REDECLARE(MSVCRT, strlen);
     BOF_LOCAL(NTDLL, memcpy); \
     BOF_LOCAL(KERNEL32, lstrcatW); \
     BOF_LOCAL(KERNEL32, lstrlenW); \
-    BOF_LOCAL(KERNEL32, GetLastError);
-    BOF_LOCAL(MSVCRT, mbstowcs);
+    BOF_LOCAL(KERNEL32, GetLastError); \
+    BOF_LOCAL(MSVCRT, mbstowcs); \
     BOF_LOCAL(MSVCRT, strlen);
 
 extern "C" void go(char* args, int alen) {
@@ -52,11 +52,11 @@ extern "C" void go(char* args, int alen) {
 
     datap  parser;
     char *path;
+    WCHAR szFilePath[MAX_PATH];
 
     BeaconDataParse(&parser, args, alen);
-    path = BeaconDataParse(&parser);
-
-    WCHAR szFilePath[MAX_PATH];
+    path = BeaconDataExtract(&parser, NULL);
+    
     const size_t size = strlen(path) + 1;
     mbstowcs(szFilePath, path, size);
 
